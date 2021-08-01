@@ -1,4 +1,5 @@
 from flask import Flask
+from logic import square_of_number_plus_nine
 
 
 # Create Flask's `app` object
@@ -16,3 +17,8 @@ app = Flask(
     template_folder="templates",
     static_folder="static"
 )
+
+@app.route("/")
+def hello():
+    value = square_of_number_plus_nine(5)
+    return value
