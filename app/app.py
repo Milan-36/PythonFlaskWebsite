@@ -159,6 +159,12 @@ def signup_page():
 
 @app.route('/actors/login', methods=['GET', 'POST'])
 def login_page():
+    login_form = LoginForm(request.form)
+    # form = LoginForm()
+    if request.method == 'POST' and login_form.validate():
+        if (request.email.data == "mkp6@gmail.com") and (request.password.data == "IS@601"):
+            return redirect("/index", code=302)
+
     return render_template(
         'login.html',
         form=LoginForm(),
