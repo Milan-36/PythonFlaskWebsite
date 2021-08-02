@@ -5,6 +5,7 @@ from flask import Flask, request, Response, redirect, render_template, make_resp
 from flaskext.mysql import MySQL
 from pymysql.cursors import DictCursor
 from forms import SignupForm, LoginForm
+from flask_login import login_required, logout_user
 
 app = Flask(__name__)
 mysql = MySQL(cursorclass=DictCursor)
@@ -165,6 +166,13 @@ def login_page():
         template='login-page',
         body="Log in with your User account."
     )
+
+@app.route("/actors/logout")
+@login_required
+def logout():
+    """User log-out logic."""
+    logout_user()
+    return render_template('login.html')
 
 @app.errorhandler(404)
 def not_found():
