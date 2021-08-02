@@ -1,7 +1,13 @@
 Flask
 flask-mysql
+flask-sqlalchemy
+flask-login
+flask-session
+flask-wtf
 simplejson
 mysql-connector
-flask-wtf
 wtforms
 email_validator
+python-dotenv
+ddtrace
+redis
