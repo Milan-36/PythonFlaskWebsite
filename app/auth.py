@@ -1,9 +1,10 @@
 """Routes for user authentication."""
 from flask import Blueprint, redirect, render_template, flash, request, session, url_for
-from flask_login import login_required, logout_user, current_user, login_user
+from flask_login import login_required, logout_user, current_user, login_user, LoginManager
 from .forms import LoginForm, SignupForm
 from .models import db, User
-from . import login_manager
+
+login_manager = LoginManager()
 
 
 # Blueprint Configuration
@@ -16,7 +17,33 @@ auth_bp = Blueprint(
 
 @auth_bp.route('/actors/login', methods=['GET', 'POST'])
 def login():
-    # Login route logic goes here
+    """
+    Log-in page for registered users.
+
+    GET requests serve Log-in page.
+    POST requests validate and redirect user to dashboard.
+    """
+    # Bypass if user is logged in
+    if current_user.is_authenticated:
+        return redirect(url_for('main_bp.dashboard'))
+
+    form = LoginForm()
+    # Validate login attempt
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(password=form.password.data):
+            login_user(user)
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('main_bp.dashboard'))
+        flash('Invalid username/password combination')
+        return redirect(url_for('auth_bp.login'))
+    return render_template(
+        'login.html',
+        form=form,
+        title='Log in.',
+        template='login-page',
+        body="Log in with your User account."
+    )
 
 
 @auth_bp.route('/signup', methods=['GET', 'POST'])
