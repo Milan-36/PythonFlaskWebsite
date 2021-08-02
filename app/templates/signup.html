@@ -12,6 +12,17 @@
         <h2 class="title">Sign In</h2>
         <form method="POST" action="/signin">
             {{ form.csrf_token }}
+            <fieldset class="form-field">{{ form.name.label }} {{ form.name(placeholder='Enter your name') }}
+                {% if form.name.errors %}
+                <ul class="errors">
+                    {% for error in form.name.errors %}
+                    <li class="error">
+                        <i class="fas fa-exclamation"></i> <span class="error-message">{{ error }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </fieldset>
             <fieldset class="form-field">{{ form.email.label }} {{ form.email(placeholder='email address') }}
                 {% if form.email.errors %}
                 <ul class="errors">

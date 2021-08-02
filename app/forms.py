@@ -6,6 +6,10 @@ from wtforms.validators import DataRequired, EqualTo, Email
 
 class SignupForm(FlaskForm):
     """Sign up for a user account."""
+    name = StringField(
+        'Name',
+        [DataRequired()]
+    )
     email = StringField(
         "Email",
         [
