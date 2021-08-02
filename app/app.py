@@ -176,7 +176,13 @@ def bad_request():
         400
     )
 
-
+@app.errorhandler(500)
+def server_error():
+    """Internal server error."""
+    return make_response(
+        render_template("500.html"),
+        500
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
