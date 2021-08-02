@@ -1,0 +1,42 @@
+{% block styles %}
+<link
+        rel="stylesheet"
+        href="/static/css/form.css"
+        type="text/css"
+/>
+{% endblock %}
+{% include 'layout.html' %}
+{% block content %}
+<main class="container">
+    <div class="form-wrapper">
+        <h2 class="title">Sign In</h2>
+        <form method="POST" action="/signin">
+            {{ form.csrf_token }}
+            <fieldset class="form-field">{{ form.email.label }} {{ form.email(placeholder='email address') }}
+                {% if form.email.errors %}
+                <ul class="errors">
+                    {% for error in form.email.errors %}
+                    <li class="error">
+                        <i class="fas fa-exclamation"></i> <span class="error-message">{{ error }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </fieldset>
+
+            <fieldset class="form-field">{{ form.password.label }} {{ form.password(placeholder='password') }}
+                {% if form.password.errors %}
+                <ul class="errors">
+                    {% for error in form.password.errors %}
+                    <li class="error">
+                        <i class="fas fa-exclamation"></i> <span class="error-message">{{ error }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </fieldset>
+            <input id="submit" name="submit" type="submit" value="Submit">
+        </form>
+    </div>
+</main>
+{% endblock %}

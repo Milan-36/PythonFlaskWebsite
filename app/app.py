@@ -1,57 +1,163 @@
-from flask import Flask, Markup, render_template, make_response, request, jsonify
-from logic import square_of_number_plus_nine
+from typing import List, Dict
+import simplejson as json
+from flask import Flask, request, Response, redirect
+from flask import render_template
+from flaskext.mysql import MySQL
+from pymysql.cursors import DictCursor
+from forms import SignupForm
+import os
 
-
-# Create Flask's `app` object
 app = Flask(__name__)
+mysql = MySQL(cursorclass=DictCursor)
+
+app.config['MYSQL_DATABASE_HOST'] = 'db'
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+app.config['MYSQL_DATABASE_PORT'] = 3306
+app.config['MYSQL_DATABASE_DB'] = 'citiesData'
+mysql.init_app(app)
+
+nav = [
+    {'name': 'Contact Us', 'url': '/contact'},
+    {'name': 'Home', 'url': '/index'}
+]
 
 
-# Create Flask's `app` object
-app = Flask(
-    __name__,
-    instance_relative_config=False,
-    template_folder="templates",
-    static_folder="static"
-)
+SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY
 
-@app.route("/")
-def hello():
-    return "Hello World!"
-
-@app.route("/")
-def logic():
-    value = square_of_number_plus_nine(5)
-    return value
-
-@app.route("/")
-def Markup():
-    return Markup("<h1>Hello World!</h1>")
-
-@app.route("/")
-def render_template():
-    return render_template("index.html")
-
-@app.route("/response")
-def response():
-    headers = {"Content-Type": "application/json"}
-    return make_response('it worked!', 200, headers)
+@app.route('/', methods=['GET'])
+def index():
+    user = {'username': 'Actor Project'}
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM oscar_age_male')
+    result = cursor.fetchall()
+    return render_template('index.html', title='Home', user=user, actors=result)
 
 
-@app.route("/get", methods=['GET'])
-def get_hello():
-    if request.method != 'GET':
-        return make_response('Malformed request', 400)
-    headers = {"Content-Type": "application/json"}
-    return make_response('it worked!', 200, headers)
+@app.route('/view/<int:actor_id>', methods=['GET'])
+def record_view(actor_id):
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM oscar_age_male WHERE id=%s', actor_id)
+    result = cursor.fetchall()
+    return render_template('view.html', title='View Form', actor=result[0])
 
 
-@app.route("/", methods=['GET'])
-def hello():
-    if request.method != 'GET':
-        return make_response('Malformed request', 400)
-    my_dict = {'key': 'dictionary value'}
-    headers = {"Content-Type": "application/json"}
-    return make_response(jsonify(my_dict), 200, headers)
+@app.route('/edit/<int:actor_id>', methods=['GET'])
+def form_edit_get(actor_id):
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM oscar_age_male WHERE id=%s', actor_id)
+    result = cursor.fetchall()
+    return render_template('edit.html', title='Edit Form', actor=result[0])
+
+
+@app.route('/edit/<int:actor_id>', methods=['POST'])
+def form_update_post(actor_id):
+    cursor = mysql.get_db().cursor()
+    inputData = (request.form.get('Year'),
+                 request.form.get('Age'),
+                 request.form.get('Name'),
+                 request.form.get('Movie'), actor_id)
+    sql_update_query = """UPDATE oscar_age_male t SET t.Year = %s, t.Age = %s,
+    t.Name = %s, t.Movie = %s WHERE t.id = %s """
+    cursor.execute(sql_update_query, inputData)
+    mysql.get_db().commit()
+    return redirect("/", code=302)
+
+@app.route('/actors/new', methods=['GET'])
+def form_insert_get():
+    return render_template('new.html', title='New Actor Form')
+
+
+@app.route('/actors/new', methods=['POST'])
+def form_insert_post():
+    cursor = mysql.get_db().cursor()
+    inputData = (request.form.get('Year'),
+                 request.form.get('Age'),
+                 request.form.get('Name'),
+                 request.form.get('Movie'))
+    sql_insert_query = """INSERT INTO oscar_age_male (Year, Age, Name, Movie) VALUES (%s, %s,%s, %s) """
+    cursor.execute(sql_insert_query, inputData)
+    mysql.get_db().commit()
+    return redirect("/", code=302)
+
+@app.route('/delete/<int:actor_id>', methods=['POST'])
+def form_delete_post(actor_id):
+    cursor = mysql.get_db().cursor()
+    sql_delete_query = """DELETE FROM oscar_age_male WHERE id = %s """
+    cursor.execute(sql_delete_query, actor_id)
+    mysql.get_db().commit()
+    return redirect("/", code=302)
+
+
+@app.route('/api/v1/actors', methods=['GET'])
+def api_browse() -> str:
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM oscar_age_male')
+    result = cursor.fetchall()
+    json_result = json.dumps(result);
+    resp = Response(json_result, status=200, mimetype='application/json')
+    return resp
+
+
+@app.route('/api/v1/actors/<int:actor_id>', methods=['GET'])
+def api_retrieve(actor_id) -> str:
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM oscar_age_male WHERE id=%s', actor_id)
+    result = cursor.fetchall()
+    json_result = json.dumps(result);
+    resp = Response(json_result, status=200, mimetype='application/json')
+    return resp
+
+
+@app.route('/api/v1/actors', methods=['POST'])
+def api_add() -> str:
+    content = request.json
+    cursor = mysql.get_db().cursor()
+    inputData = (content['Year'], content['Age'],
+                 content['Name'], content['Movie'])
+    sql_insert_query = """INSERT INTO 
+        oscar_age_male (Year, Age, Name, Movie) 
+        VALUES (%s, %s,%s, %s) """
+    cursor.execute(sql_insert_query, inputData)
+    mysql.get_db().commit()
+    resp = Response(status=201, mimetype='application/json')
+    return resp
+
+
+@app.route('/api/v1/actors/<int:actor_id>', methods=['PUT'])
+def api_edit(actor_id) -> str:
+    cursor = mysql.get_db().cursor()
+    content = request.json
+    inputData = (content['ID'], content['Year'], content['Age'],
+                 content['Name'], content['Movie'], actor_id)
+    sql_update_query = """UPDATE oscar_age_male t SET t.ID = %s, t.Year = %s, t.Age = %s,
+    t.Name = %s, t.Movie = %s WHERE t.id = %s """
+    cursor.execute(sql_update_query, inputData)
+    mysql.get_db().commit()
+    resp = Response(status=201, mimetype='application/json')
+    return resp
+
+
+@app.route('/api/v1/actors/<int:actor_id>', methods=['DELETE'])
+def api_delete(actor_id) -> str:
+    cursor = mysql.get_db().cursor()
+    sql_delete_query = """DELETE FROM oscar_age_male WHERE id = %s """
+    cursor.execute(sql_delete_query, actor_id)
+    mysql.get_db().commit()
+    resp = Response(status=210, mimetype='application/json')
+    return resp
+
+
+@app.route('/actors/signup', methods=['GET', 'POST'])
+def signup_page():
+    return render_template(
+        '/signup.html',
+        title='Create a new Account',
+        form=SignupForm(),
+        template='signup-page',
+        body="Enter Email, and a new password to create an account"
+    )
 
 
 if __name__ == '__main__':
