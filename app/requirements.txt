@@ -5,3 +5,7 @@ mysql-connector
 flask-wtf
 wtforms
 email_validator
+python-dotenv
+flask-sqlalchemy
+flask-login
+ddtrace
