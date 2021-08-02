@@ -1,6 +1,9 @@
 """Routes for user authentication."""
-from flask import Blueprint, render_template, request
-from .forms import SignupForm
+from flask import Blueprint, redirect, render_template, flash, request, session, url_for
+from flask_login import login_required, logout_user, current_user, login_user
+from .forms import LoginForm, SignupForm
+from .models import db, User
+from . import login_manager
 
 
 # Blueprint Configuration
@@ -26,8 +29,20 @@ def signup():
     """
     form = SignupForm()
     if form.validate_on_submit():
-        # User sign-up logic will go here.
-        ...
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user is None:
+            user = User(
+                name=form.name.data,
+                email=form.email.data,
+                website=form.website.data
+            )
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()  # Create new user
+            login_user(user)  # Log in as newly created user
+            return redirect(url_for('main_bp.dashboard'))
+        flash('A user already exists with that email address.')
+
     return render_template(
         '/signup.html',
         title='Create a new Account',
