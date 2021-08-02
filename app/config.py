@@ -3,6 +3,7 @@ import os
 import redis
 
 
+
 class Config:
     def __init__(self):
         pass
