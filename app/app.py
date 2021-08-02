@@ -4,6 +4,7 @@ from flask import Flask, request, Response, redirect
 from flask import render_template
 from flaskext.mysql import MySQL
 from pymysql.cursors import DictCursor
+from forms import SignupForm
 
 app = Flask(__name__)
 mysql = MySQL(cursorclass=DictCursor)
@@ -142,6 +143,17 @@ def api_delete(actor_id) -> str:
     mysql.get_db().commit()
     resp = Response(status=210, mimetype='application/json')
     return resp
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup_page():
+    return render_template(
+        '/signup.html',
+        title='Create a new Account',
+        form=SignupForm(),
+        template='signup-page',
+        body="Enter Name, Email, and password to create an account"
+    )
 
 
 if __name__ == '__main__':
