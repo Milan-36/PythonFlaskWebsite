@@ -77,3 +77,11 @@ def signup():
         template='signup-page',
         body="Enter Email, and a new password to create an account"
     )
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Check if user is logged-in on every page load."""
+    if user_id is not None:
+        return User.query.get(user_id)
+    return None
