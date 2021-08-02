@@ -15,7 +15,7 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
 app.config['MYSQL_DATABASE_PORT'] = 3306
 app.config['MYSQL_DATABASE_DB'] = 'citiesData'
 mysql.init_app(app)
-app.config.from_pyfile('config.Config')
+app.config.from_object('config.Config')
 
 nav = [
     {'name': 'Contact Us', 'url': '/contact'},
