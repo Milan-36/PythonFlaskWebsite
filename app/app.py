@@ -4,7 +4,7 @@ from flask import Flask, request, Response, redirect, render_template, make_resp
 # from flask import render_template
 from flaskext.mysql import MySQL
 from pymysql.cursors import DictCursor
-from forms import SignupForm
+from forms import SignupForm, LoginForm
 
 app = Flask(__name__)
 mysql = MySQL(cursorclass=DictCursor)
@@ -154,6 +154,16 @@ def signup_page():
         form=SignupForm(),
         template='signup-page',
         body="Enter Email, and a new password to create an account"
+    )
+
+@app.route('/actors/login', methods=['GET', 'POST'])
+def login_page():
+    return render_template(
+        'login.html',
+        form=LoginForm(),
+        title='Log in.',
+        template='login-page',
+        body="Log in with your User account."
     )
 
 @app.errorhandler(404)
