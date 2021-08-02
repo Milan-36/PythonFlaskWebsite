@@ -5,7 +5,6 @@ from flask import Flask, request, Response, redirect, render_template, make_resp
 from flaskext.mysql import MySQL
 from pymysql.cursors import DictCursor
 from forms import SignupForm
-import os
 
 app = Flask(__name__)
 mysql = MySQL(cursorclass=DictCursor)
@@ -16,15 +15,13 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
 app.config['MYSQL_DATABASE_PORT'] = 3306
 app.config['MYSQL_DATABASE_DB'] = 'citiesData'
 mysql.init_app(app)
+app.config.from_object('config.Config')
 
 nav = [
     {'name': 'Contact Us', 'url': '/contact'},
     {'name': 'Home', 'url': '/index'}
 ]
 
-
-SECRET_KEY = os.urandom(32)
-app.config['SECRET_KEY'] = SECRET_KEY
 
 @app.route('/', methods=['GET'])
 def index():
