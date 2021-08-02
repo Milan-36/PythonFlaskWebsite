@@ -2,7 +2,7 @@
 import os
 
 class Config:
-    SECRET_KEY = os.urandom(32)
+    SECRET_KEY = os.urandom(32)  # to generate secret key
     # app.config['SECRET_KEY'] = SECRET_KEY
     TESTING = True
     DEBUG = True
