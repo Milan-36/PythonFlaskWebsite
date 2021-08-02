@@ -1,7 +1,7 @@
 from typing import List, Dict
 import simplejson as json
-from flask import Flask, request, Response, redirect
-from flask import render_template
+from flask import Flask, request, Response, redirect, render_template, make_response
+# from flask import render_template
 from flaskext.mysql import MySQL
 from pymysql.cursors import DictCursor
 from forms import SignupForm
@@ -159,6 +159,30 @@ def signup_page():
         body="Enter Email, and a new password to create an account"
     )
 
+@app.errorhandler(404)
+def not_found():
+    """Page not found."""
+    return make_response(
+        render_template("404.html"),
+        404
+     )
+
+
+@app.errorhandler(400)
+def bad_request():
+    """Bad request."""
+    return make_response(
+        render_template("400.html"),
+        400
+    )
+
+@app.errorhandler(500)
+def server_error():
+    """Internal server error."""
+    return make_response(
+        render_template("500.html"),
+        500
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
