@@ -29,4 +29,16 @@ class SignupForm(FlaskForm):
             EqualTo(password, message="Passwords must match.")
         ]
     )
-    submit = SubmitField("Submit")
+    submit = SubmitField('Register')
+
+class LoginForm(FlaskForm):
+    """User Log-in Form."""
+    email = StringField(
+        'Email',
+        validators=[
+            DataRequired(),
+            Email(message='Enter a valid email.')
+        ]
+    )
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Log In')
