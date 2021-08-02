@@ -162,7 +162,7 @@ def login_page():
     return render_template(
         'login.html',
         form=LoginForm(),
-        title='Log in.',
+        title='Log in',
         template='login-page',
         body="Log in with your User account."
     )
