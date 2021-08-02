@@ -6,15 +6,13 @@
 />
 {% endblock %}
 {% include 'layout.html' %}
-{% include 'navigation.html' %}
 {% block content %}
 <main class="container">
     <div class="form-wrapper">
         <h2 class="title">Sign In</h2>
-        <p><i>Type same as given placeholder in input</i></p>
         <form method="POST" action="/signin">
             {{ form.csrf_token }}
-            <fieldset class="form-field">{{ form.email.label }} {{ form.email(placeholder='njit@gmail.com') }}
+            <fieldset class="form-field">{{ form.email.label }} {{ form.email(placeholder='email address') }}
                 {% if form.email.errors %}
                 <ul class="errors">
                     {% for error in form.email.errors %}
