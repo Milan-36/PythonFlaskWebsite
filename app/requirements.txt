@@ -4,3 +4,4 @@ simplejson
 mysql-connector
 flask-wtf
 wtforms
+email_validator
