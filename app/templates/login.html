@@ -1,7 +1,14 @@
-{% extends "layout.jinja2" %}
-
+{% block styles %}
+<link
+        rel="stylesheet"
+        href="/static/css/form.css"
+        type="text/css"
+/>
+{% endblock %}
+{% extends "layout.html" %}
 
 {% block content %}
+<main class="container">
   <div class="form-wrapper">
 
     {% for message in get_flashed_messages() %}
@@ -53,5 +60,5 @@
       </div>
     </form>
   </div>
-
+</main>
 {% endblock %}
