@@ -10,7 +10,7 @@
 <main class="container">
     <div class="form-wrapper">
         <h2 class="title">Sign In</h2>
-        <form method="POST" action="/signin">
+        <form method="POST" action="/signup">
             {{ form.csrf_token }}
             <fieldset class="form-field">{{ form.name.label }} {{ form.name(placeholder='Enter your name') }}
                 {% if form.name.errors %}
