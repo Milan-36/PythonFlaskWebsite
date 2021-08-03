@@ -23,8 +23,7 @@ nav = [
     {'name': 'Home', 'url': '/index'}
 ]
 
-
-@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def index():
     user = {'username': 'Actor Project'}
     cursor = mysql.get_db().cursor()
@@ -157,13 +156,13 @@ def signup_page():
         body="Enter Email, and a new password to create an account"
     )
 
-@app.route('/actors/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login_page():
     login_form = LoginForm(request.form)
     # form = LoginForm()
     if request.method == 'POST' and login_form.validate():
         if (request.email.data == "mkp6@gmail.com") and (request.password.data == "IS@601"):
-            return redirect("/index", code=302)
+            return redirect("/actors/index", code=302)
 
     return render_template(
         'login.html',
@@ -181,7 +180,7 @@ def logout():
     return render_template('login.html')
 
 @app.errorhandler(404)
-def not_found():
+def not_found(e):
     """Page not found."""
     return make_response(
         render_template("404.html"),
@@ -190,7 +189,7 @@ def not_found():
 
 
 @app.errorhandler(400)
-def bad_request():
+def bad_request(e):
     """Bad request."""
     return make_response(
         render_template("400.html"),
@@ -198,7 +197,7 @@ def bad_request():
     )
 
 @app.errorhandler(500)
-def server_error():
+def server_error(e):
     """Internal server error."""
     return make_response(
         render_template("500.html"),
